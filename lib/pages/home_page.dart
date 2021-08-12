@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:uni_mate/model/lecture_model.dart';
 import 'package:uni_mate/routes/app_router.dart';
 import 'package:uni_mate/constants/shared_pref_keys.dart';
 import 'package:uni_mate/model/user_data_model.dart';
 import 'package:sizer/sizer.dart';
+import 'package:uni_mate/services/api_services.dart';
 import 'package:uni_mate/services/local_services.dart';
+import 'package:uni_mate/widgets/lecture_card.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -35,6 +38,7 @@ class _HomePageState extends State<HomePage> {
           color: Colors.grey.withOpacity(0.1),
           child: ListView(
             padding: EdgeInsets.symmetric(horizontal: 5.w),
+            physics: BouncingScrollPhysics(),
             children: [
               SizedBox(
                 height: 2.h,
@@ -88,7 +92,12 @@ class _HomePageState extends State<HomePage> {
                                   Icons.logout_rounded,
                                   color: Colors.orange,
                                 ),
-                                title: new Text('Log out'),
+                                title: new Text(
+                                  'Log out',
+                                  style: TextStyle(
+                                    color: Colors.orange,
+                                  ),
+                                ),
                                 onTap: () async {
                                   await LocalServices
                                       .removeUserDataSharedPref();
@@ -111,6 +120,9 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
+              SizedBox(
+                height: 4.h,
+              ),
               FutureBuilder(
                 future: getUserData(),
                 builder: (BuildContext futureBuildercontext,
@@ -123,13 +135,37 @@ class _HomePageState extends State<HomePage> {
                     } else if (snapshot.hasData) {
                       final UserData userData = snapshot.data;
                       currentUserData = userData;
-                      return Column(
-                        children: [
-                          Text("userId: ${userData.userId}"),
-                          Text("userName: ${userData.userName}"),
-                          Text("batchId: ${userData.batchId}"),
-                          Text("degreeId: ${userData.degreeId}"),
-                        ],
+                      return FutureBuilder(
+                        future: APIServices.getLectures(userData: userData),
+                        builder:
+                            (BuildContext context, AsyncSnapshot snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.done) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                  child: Text(snapshot.error.toString()));
+                            } else if (snapshot.hasData) {
+                              List<Lecture> lectures = snapshot.data;
+                              return ListView.builder(
+                                physics: BouncingScrollPhysics(),
+                                padding: EdgeInsets.all(0),
+                                shrinkWrap: true,
+                                itemCount: lectures.length,
+                                itemBuilder: (BuildContext context, int index) {
+                                  Lecture lecture = lectures[index];
+                                  return LectureCard(
+                                    lecture: lecture,
+                                  );
+                                },
+                              );
+                            }
+                          }
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.orange,
+                            ),
+                          );
+                        },
                       );
                     }
                   }

@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:uni_mate/model/lecture_model.dart';
 import 'package:uni_mate/model/user_data_model.dart';
 import 'package:uni_mate/services/local_services.dart';
 
@@ -26,6 +27,29 @@ class APIServices {
       }
     } else {
       throw "some feilds are empty";
+    }
+  }
+
+  static Future<List<Lecture>> getLectures({required UserData userData}) async {
+    try {
+      await Future.delayed(Duration(seconds: 3));
+      List<Lecture> lectures = [];
+      Random random = new Random();
+      int value = random.nextInt(6);
+      print("THIS IS VALUE $value");
+      int nowTime = DateTime.now().millisecondsSinceEpoch;
+      for (var i = 0; i < value; i++) {
+        lectures.add(
+          Lecture(
+              lectureId: "$i",
+              lectureName: "Reinforcement learning",
+              lecturerName: "Dr. Harsha Subasinghe",
+              lectureTime: nowTime),
+        );
+      }
+      return lectures;
+    } catch (e) {
+      throw e;
     }
   }
 }
