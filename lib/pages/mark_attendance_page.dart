@@ -6,6 +6,7 @@ import 'package:location/location.dart';
 
 import 'package:uni_mate/model/lecture_model.dart';
 import 'package:sizer/sizer.dart';
+import 'package:uni_mate/services/api_services.dart';
 import 'package:uni_mate/services/my_location_service.dart';
 
 class MarkAttendancePage extends StatefulWidget {
@@ -20,6 +21,25 @@ class MarkAttendancePage extends StatefulWidget {
 }
 
 class _MarkAttendancePageState extends State<MarkAttendancePage> {
+  Future<void> markAttendance() async {
+    try {
+      bool isSuccess = await APIServices.markAttendance(
+          scheduleId: widget.lecture.lectureId);
+      if (isSuccess) {
+        SnackBar snackBar =
+            SnackBar(content: Text("your attendance marked succeefully!"));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      } else {
+        SnackBar snackBar =
+            SnackBar(content: Text("failed to mark attendance!"));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }
+    } catch (e) {
+      SnackBar snackBar = SnackBar(content: Text("erorr $e"));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     DateFormat format = DateFormat("HH:mm");
@@ -110,19 +130,22 @@ class _MarkAttendancePageState extends State<MarkAttendancePage> {
                               ),
                               Align(
                                 alignment: Alignment.centerRight,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.orange,
-                                    borderRadius: BorderRadius.circular(2.w),
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 5.w, vertical: 2.w),
-                                  child: Text(
-                                    "Attend Now",
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 14.sp,
-                                        fontWeight: FontWeight.w500),
+                                child: GestureDetector(
+                                  onTap: () => markAttendance(),
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange,
+                                      borderRadius: BorderRadius.circular(2.w),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 5.w, vertical: 2.w),
+                                    child: Text(
+                                      "Attend Now",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500),
+                                    ),
                                   ),
                                 ),
                               ),
@@ -138,7 +161,7 @@ class _MarkAttendancePageState extends State<MarkAttendancePage> {
                   Container(
                     height: (constraints.maxHeight * 60) / 100,
                     child: FutureBuilder(
-                      future: MyLocationService.getLoc(),
+                      future: MyLocationService.getCurrentLocation(),
                       builder: (BuildContext context, AsyncSnapshot snapshot) {
                         if (snapshot.connectionState == ConnectionState.done) {
                           if (snapshot.hasError) {

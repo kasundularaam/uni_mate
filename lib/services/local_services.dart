@@ -8,8 +8,8 @@ class LocalServices {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.setString(SharedPrefKeys.userId, userData.userId);
     preferences.setString(SharedPrefKeys.userName, userData.userName);
-    preferences.setString(SharedPrefKeys.batchId, userData.batchId);
-    preferences.setString(SharedPrefKeys.degreeId, userData.degreeId);
+    preferences.setString(SharedPrefKeys.batchId, userData.batch);
+    preferences.setString(SharedPrefKeys.degreeId, userData.degree);
   }
 
   static Future<UserData> getUserDataSharedPref() async {
@@ -17,8 +17,8 @@ class LocalServices {
     UserData userData = UserData(
         userId: preferences.getString(SharedPrefKeys.userId) ?? "",
         userName: preferences.getString(SharedPrefKeys.userName) ?? "",
-        batchId: preferences.getString(SharedPrefKeys.batchId) ?? "",
-        degreeId: preferences.getString(SharedPrefKeys.degreeId) ?? "");
+        batch: preferences.getString(SharedPrefKeys.batchId) ?? "",
+        degree: preferences.getString(SharedPrefKeys.degreeId) ?? "");
     return userData;
   }
 

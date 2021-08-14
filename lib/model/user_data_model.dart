@@ -3,13 +3,13 @@ import 'dart:convert';
 class UserData {
   final String userId;
   final String userName;
-  final String batchId;
-  final String degreeId;
+  final String batch;
+  final String degree;
   UserData({
     required this.userId,
     required this.userName,
-    required this.batchId,
-    required this.degreeId,
+    required this.batch,
+    required this.degree,
   });
 
   UserData copyWith({
@@ -21,8 +21,8 @@ class UserData {
     return UserData(
       userId: userId ?? this.userId,
       userName: userName ?? this.userName,
-      batchId: batchId ?? this.batchId,
-      degreeId: degreeId ?? this.degreeId,
+      batch: batchId ?? this.batch,
+      degree: degreeId ?? this.degree,
     );
   }
 
@@ -30,8 +30,8 @@ class UserData {
     return {
       'userId': userId,
       'userName': userName,
-      'batchId': batchId,
-      'degreeId': degreeId,
+      'batchId': batch,
+      'degreeId': degree,
     };
   }
 
@@ -39,8 +39,8 @@ class UserData {
     return UserData(
       userId: map['userId'],
       userName: map['userName'],
-      batchId: map['batchId'],
-      degreeId: map['degreeId'],
+      batch: map['batchId'],
+      degree: map['degreeId'],
     );
   }
 
@@ -51,7 +51,7 @@ class UserData {
 
   @override
   String toString() {
-    return 'UserData(userId: $userId, userName: $userName, batchId: $batchId, degreeId: $degreeId)';
+    return 'UserData(userId: $userId, userName: $userName, batchId: $batch, degreeId: $degree)';
   }
 
   @override
@@ -61,15 +61,15 @@ class UserData {
     return other is UserData &&
         other.userId == userId &&
         other.userName == userName &&
-        other.batchId == batchId &&
-        other.degreeId == degreeId;
+        other.batch == batch &&
+        other.degree == degree;
   }
 
   @override
   int get hashCode {
     return userId.hashCode ^
         userName.hashCode ^
-        batchId.hashCode ^
-        degreeId.hashCode;
+        batch.hashCode ^
+        degree.hashCode;
   }
 }

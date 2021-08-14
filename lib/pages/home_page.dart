@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                               ListTile(
                                 leading: new Icon(Icons.group_rounded),
                                 title: new Text(currentUserData != null
-                                    ? currentUserData!.batchId
+                                    ? currentUserData!.batch
                                     : ""),
                                 onTap: () {
                                   Navigator.pop(bottomSheetContext);
@@ -81,7 +81,7 @@ class _HomePageState extends State<HomePage> {
                               ListTile(
                                 leading: new Icon(Icons.school_rounded),
                                 title: new Text(currentUserData != null
-                                    ? currentUserData!.degreeId
+                                    ? currentUserData!.degree
                                     : ""),
                                 onTap: () {
                                   Navigator.pop(bottomSheetContext);
@@ -136,7 +136,7 @@ class _HomePageState extends State<HomePage> {
                       final UserData userData = snapshot.data;
                       currentUserData = userData;
                       return FutureBuilder(
-                        future: APIServices.getLectures(userData: userData),
+                        future: APIServices.getSchedules(userData: userData),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==

@@ -23,7 +23,7 @@ class MyLocationService {
     }
   }
 
-  static Future<LocationData> getLoc() async {
+  static Future<LocationData> getCurrentLocation() async {
     LocationData locationData = await location.getLocation();
     return locationData;
   }
