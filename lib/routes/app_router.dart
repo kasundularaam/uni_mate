@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_mate/model/lecture_model.dart';
+import 'package:uni_mate/model/response_schedule.dart';
 import 'package:uni_mate/pages/home_page.dart';
 import 'package:uni_mate/pages/login_page.dart';
 import 'package:uni_mate/pages/mark_attendance_page.dart';
@@ -20,10 +20,10 @@ class AppRouter {
       case login:
         return MaterialPageRoute(builder: (_) => LoginPage());
       case markAttendancePage:
-        Lecture lecture = settings.arguments as Lecture;
+        ResponseSchedule schedule = settings.arguments as ResponseSchedule;
         return MaterialPageRoute(
           builder: (_) => MarkAttendancePage(
-            lecture: lecture,
+            schedule: schedule,
           ),
         );
       default:

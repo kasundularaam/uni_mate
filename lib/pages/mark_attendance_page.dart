@@ -1,19 +1,20 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:intl/intl.dart';
 import "package:latlong2/latlong.dart" as latLng;
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:location/location.dart';
-
-import 'package:uni_mate/model/lecture_model.dart';
 import 'package:sizer/sizer.dart';
+
+import 'package:uni_mate/model/response_schedule.dart';
 import 'package:uni_mate/services/api_services.dart';
+import 'package:uni_mate/services/local_services.dart';
 import 'package:uni_mate/services/my_location_service.dart';
 
 class MarkAttendancePage extends StatefulWidget {
-  final Lecture lecture;
+  final ResponseSchedule schedule;
   const MarkAttendancePage({
     Key? key,
-    required this.lecture,
+    required this.schedule,
   }) : super(key: key);
 
   @override
@@ -21,11 +22,19 @@ class MarkAttendancePage extends StatefulWidget {
 }
 
 class _MarkAttendancePageState extends State<MarkAttendancePage> {
+  Future<bool> attendanceStatus() async {
+    bool attendend =
+        await LocalServices.attendanceStatus(scheduleId: widget.schedule.id);
+    return attendend;
+  }
+
   Future<void> markAttendance() async {
     try {
-      bool isSuccess = await APIServices.markAttendance(
-          scheduleId: widget.lecture.lectureId);
+      bool isSuccess =
+          await APIServices.markAttendance(scheduleId: widget.schedule.id);
       if (isSuccess) {
+        LocalServices.markAttendance(scheduleId: widget.schedule.id);
+        setState(() {});
         SnackBar snackBar =
             SnackBar(content: Text("your attendance marked succeefully!"));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -35,16 +44,15 @@ class _MarkAttendancePageState extends State<MarkAttendancePage> {
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } catch (e) {
-      SnackBar snackBar = SnackBar(content: Text("erorr $e"));
+      SnackBar snackBar = SnackBar(content: Text("$e"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    DateFormat format = DateFormat("HH:mm");
-    String formattedTime = format.format(
-        DateTime.fromMillisecondsSinceEpoch(widget.lecture.lectureTime));
+    DateFormat format = DateFormat("yyyy.MM.dd");
+    String formattedDate = format.format(widget.schedule.date);
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -52,7 +60,6 @@ class _MarkAttendancePageState extends State<MarkAttendancePage> {
           builder: (BuildContext context, BoxConstraints constraints) {
             return Container(
               color: Colors.grey.withOpacity(0.1),
-              padding: EdgeInsets.symmetric(horizontal: 5.w),
               child: Column(
                 children: [
                   Container(
@@ -60,96 +67,165 @@ class _MarkAttendancePageState extends State<MarkAttendancePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => Navigator.pop(context),
-                              child: Padding(
-                                padding: EdgeInsets.all(2.w),
-                                child: Icon(
-                                  Icons.arrow_back_ios_rounded,
-                                  size: 24.sp,
-                                  color: Colors.orange,
-                                ),
+                        Container(
+                          color: Colors.white,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 1.h,
                               ),
-                            ),
-                            SizedBox(
-                              width: 5.w,
-                            ),
-                            Text(
-                              "Mark attendance",
-                              style: TextStyle(
-                                  color: Colors.orange,
-                                  fontSize: 24.sp,
-                                  fontWeight: FontWeight.w500),
-                            ),
-                          ],
+                              Row(
+                                children: [
+                                  InkWell(
+                                    onTap: () => Navigator.pop(context),
+                                    child: Padding(
+                                      padding: EdgeInsets.fromLTRB(
+                                          5.w, 2.w, 2.w, 2.w),
+                                      child: Icon(
+                                        Icons.arrow_back_ios_rounded,
+                                        size: 20.sp,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    width: 1.w,
+                                  ),
+                                  Text(
+                                    "Mark attendance",
+                                    style: TextStyle(
+                                        color: Colors.orange,
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 1.h,
+                              ),
+                            ],
+                          ),
                         ),
                         SizedBox(
                           height: 3.h,
                         ),
-                        Container(
-                          width: 100.w,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(2.w),
-                          ),
-                          padding: EdgeInsets.all(5.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                widget.lecture.lectureName,
-                                style: TextStyle(
-                                    color: Colors.black87,
-                                    fontSize: 18.sp,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              SizedBox(
-                                height: 1.h,
-                              ),
-                              Text(
-                                widget.lecture.lecturerName,
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontSize: 14.sp,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              SizedBox(
-                                height: 1.h,
-                              ),
-                              Text(
-                                "Start at: $formattedTime",
-                                style: TextStyle(
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 5.w),
+                          child: Container(
+                            width: 100.w,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(2.w),
+                            ),
+                            padding: EdgeInsets.all(5.w),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  widget.schedule.moduleName,
+                                  style: TextStyle(
+                                      color: Colors.black87,
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                SizedBox(
+                                  height: 1.h,
+                                ),
+                                Text(
+                                  widget.schedule.name,
+                                  style: TextStyle(
+                                      color: Colors.green.shade600,
+                                      fontSize: 14.sp,
+                                      fontWeight: FontWeight.w400),
+                                ),
+                                SizedBox(
+                                  height: 1.h,
+                                ),
+                                Text(
+                                  "$formattedDate • from ${widget.schedule.startTime.substring(0, 5)} to ${widget.schedule.endTime.substring(0, 5)}",
+                                  style: TextStyle(
                                     color: Colors.blue,
                                     fontSize: 12.sp,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                              Align(
-                                alignment: Alignment.centerRight,
-                                child: GestureDetector(
-                                  onTap: () => markAttendance(),
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: Colors.orange,
-                                      borderRadius: BorderRadius.circular(2.w),
-                                    ),
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 5.w, vertical: 2.w),
-                                    child: Text(
-                                      "Attend Now",
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.w500),
-                                    ),
+                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
-                              ),
-                            ],
+                                SizedBox(
+                                  height: 1.h,
+                                ),
+                                FutureBuilder(
+                                    future: attendanceStatus(),
+                                    builder: (BuildContext context,
+                                        AsyncSnapshot snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text("Error"),
+                                          );
+                                        } else if (snapshot.hasData) {
+                                          bool attended = snapshot.data;
+                                          if (attended) {
+                                            return Align(
+                                              alignment: Alignment.centerRight,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Colors.green
+                                                      .withOpacity(0.8),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          2.w),
+                                                ),
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal: 5.w,
+                                                    vertical: 2.w),
+                                                child: Text(
+                                                  "Attendance Marked",
+                                                  style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14.sp,
+                                                      fontWeight:
+                                                          FontWeight.w500),
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            return Align(
+                                              alignment: Alignment.centerRight,
+                                              child: GestureDetector(
+                                                onTap: () => markAttendance(),
+                                                child: Container(
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.orange,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            2.w),
+                                                  ),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5.w,
+                                                      vertical: 2.w),
+                                                  child: Text(
+                                                    "Attend Now",
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }
+                                      }
+                                      return Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.orange,
+                                        ),
+                                      );
+                                    }),
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(

@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final responseMrkAtndnc = responseMrkAtndncFromJson(jsonString);
-
 import 'dart:convert';
 
 ResponseMrkAtndnc responseMrkAtndncFromJson(String str) =>

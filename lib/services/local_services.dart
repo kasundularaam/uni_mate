@@ -29,4 +29,15 @@ class LocalServices {
     preferences.remove(SharedPrefKeys.batchId);
     preferences.remove(SharedPrefKeys.degreeId);
   }
+
+  static Future<void> markAttendance({required String scheduleId}) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.setBool(scheduleId, true);
+  }
+
+  static Future<bool> attendanceStatus({required String scheduleId}) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    bool attended = preferences.getBool(scheduleId) ?? false;
+    return attended;
+  }
 }

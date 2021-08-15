@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uni_mate/model/lecture_model.dart';
+import 'package:uni_mate/model/response_schedule.dart';
 import 'package:uni_mate/routes/app_router.dart';
 import 'package:uni_mate/constants/shared_pref_keys.dart';
 import 'package:uni_mate/model/user_data_model.dart';
 import 'package:sizer/sizer.dart';
 import 'package:uni_mate/services/api_services.dart';
 import 'package:uni_mate/services/local_services.dart';
-import 'package:uni_mate/widgets/lecture_card.dart';
+import 'package:uni_mate/widgets/schedule_card.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -72,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                               ListTile(
                                 leading: new Icon(Icons.group_rounded),
                                 title: new Text(currentUserData != null
-                                    ? currentUserData!.batch
+                                    ? "${currentUserData!.batch} batch"
                                     : ""),
                                 onTap: () {
                                   Navigator.pop(bottomSheetContext);
@@ -136,25 +136,28 @@ class _HomePageState extends State<HomePage> {
                       final UserData userData = snapshot.data;
                       currentUserData = userData;
                       return FutureBuilder(
-                        future: APIServices.getSchedules(userData: userData),
+                        future: APIServices.getSchedules(batch: userData.batch),
                         builder:
                             (BuildContext context, AsyncSnapshot snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.done) {
                             if (snapshot.hasError) {
                               return Center(
-                                  child: Text(snapshot.error.toString()));
+                                child: Text(
+                                  snapshot.error.toString(),
+                                ),
+                              );
                             } else if (snapshot.hasData) {
-                              List<Lecture> lectures = snapshot.data;
+                              List<ResponseSchedule> schedules = snapshot.data;
                               return ListView.builder(
                                 physics: BouncingScrollPhysics(),
                                 padding: EdgeInsets.all(0),
                                 shrinkWrap: true,
-                                itemCount: lectures.length,
+                                itemCount: schedules.length,
                                 itemBuilder: (BuildContext context, int index) {
-                                  Lecture lecture = lectures[index];
-                                  return LectureCard(
-                                    lecture: lecture,
+                                  ResponseSchedule schedule = schedules[index];
+                                  return ScheduleCard(
+                                    schedule: schedule,
                                   );
                                 },
                               );
