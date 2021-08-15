@@ -4,7 +4,6 @@ import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:location/location.dart';
 import 'package:uni_mate/model/post_mrk_atndnc.dart';
-import 'package:uni_mate/model/post_user.dart';
 import 'package:uni_mate/model/response_auth_s.dart';
 import 'package:uni_mate/model/response_mrk_atndnc.dart';
 import 'package:uni_mate/model/response_schedule.dart';
@@ -65,14 +64,11 @@ class APIServices {
       DateTime now = DateTime.now();
       DateFormat format = DateFormat("HH:mm:ss");
       String formattedTime = format.format(now);
-      print(formattedTime);
-      print(batch);
       http.Response response = await http
           .get(DataProviders.schedulesUrl(batch: batch, time: formattedTime));
       if (response.statusCode == 200) {
         List<ResponseSchedule> responseSchedules =
             parseSchedules(response.body);
-        print(responseSchedules);
         return responseSchedules;
       } else {
         throw "${response.statusCode} error";
@@ -89,18 +85,12 @@ class APIServices {
       String latitude = "${locationData.latitude}";
       UserData userData = await LocalServices.getUserDataSharedPref();
       String userId = userData.userId;
-      final http.Response response = await http.post(
-        DataProviders.markAttendenceUrl(),
-        headers: {HttpHeaders.contentTypeHeader: 'application/json'},
-        body: postMrkAtndncToJson(
-          PostMrkAtndnc(
-            longitude: longitude,
-            latitude: latitude,
-            user: userId,
-            schedule: scheduleId,
-          ),
-        ),
-      );
+      final http.Response response = await http.get(
+          DataProviders.markAttendenceUrl(
+              longitude: longitude,
+              latitude: latitude,
+              userId: userId,
+              scheduleId: scheduleId));
       if (response.statusCode == 200) {
         ResponseMrkAtndnc responseMrkAtndnc =
             responseMrkAtndncFromJson(response.body);

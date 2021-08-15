@@ -1,5 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.uni_mate">
+    <uses-permission android:name="android.permission.INTERNET" />
    <application
         android:label="uni_mate"
         android:icon="@mipmap/ic_launcher">

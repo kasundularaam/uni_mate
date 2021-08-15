@@ -4,9 +4,13 @@ class DataProviders {
         "http://critssl.com/nsbm_attendence/api/auth.php?userName=$email&password=$password");
   }
 
-  static Uri markAttendenceUrl() {
+  static Uri markAttendenceUrl(
+      {required String longitude,
+      required String latitude,
+      required String userId,
+      required String scheduleId}) {
     return Uri.parse(
-        "http://critssl.com/nsbm_attendence/api/markAttendence.php");
+        "http://critssl.com/nsbm_attendence/api/markAttendence.php?longitude=$longitude&latitude=$latitude&user=$userId&schedule=$scheduleId");
   }
 
   static Uri schedulesUrl({required String batch, required String time}) {
